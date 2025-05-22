@@ -1,0 +1,140 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2025-05-22T23:04:16+02:00",
+    "name": "Nodemon",
+    "author": "contact@swiftheberg.com",
+    "description": "\ud83d\udce6 Node.js + Nodemon (Auto-restart)\r\n\r\n\ud83e\udd16 Cet egg permet de cloner automatiquement un d\u00e9p\u00f4t Git pour lancer une app Node.js.\r\n\ud83c\udf31 Il installe automatiquement les d\u00e9pendances (node_modules) lors de l'installation.\r\n\ud83d\udd04 Gr\u00e2ce \u00e0 Nodemon, l'application red\u00e9marre automatiquement \u00e0 chaque modification de fichier d\u00e9tect\u00e9e dans le dossier.\r\n\ud83c\udf10 Par d\u00e9faut, la branche master est utilis\u00e9e si aucune autre n\u2019est sp\u00e9cifi\u00e9e.\r\n\r\n\u26a0\ufe0f Si tu actives user_upload, je pars du principe que tu sais ce que tu fais \ud83d\ude09",
+    "features": null,
+    "docker_images": {
+        "ghcr.io\/parkervcp\/yolks:nodejs_21": "ghcr.io\/parkervcp\/yolks:nodejs_21",
+        "ghcr.io\/parkervcp\/yolks:nodejs_20": "ghcr.io\/parkervcp\/yolks:nodejs_20",
+        "ghcr.io\/parkervcp\/yolks:nodejs_19": "ghcr.io\/parkervcp\/yolks:nodejs_19",
+        "ghcr.io\/parkervcp\/yolks:nodejs_18": "ghcr.io\/parkervcp\/yolks:nodejs_18",
+        "ghcr.io\/parkervcp\/yolks:nodejs_17": "ghcr.io\/parkervcp\/yolks:nodejs_17",
+        "ghcr.io\/parkervcp\/yolks:nodejs_16": "ghcr.io\/parkervcp\/yolks:nodejs_16",
+        "ghcr.io\/parkervcp\/yolks:nodejs_15": "ghcr.io\/parkervcp\/yolks:nodejs_15",
+        "ghcr.io\/parkervcp\/yolks:nodejs_14": "ghcr.io\/parkervcp\/yolks:nodejs_14",
+        "ghcr.io\/parkervcp\/yolks:nodejs_12": "ghcr.io\/parkervcp\/yolks:nodejs_12"
+    },
+    "file_denylist": [],
+    "startup": "npm install nodemon; if [[ -d .git ]] && [[ {{AUTO_UPDATE}} == \"1\" ]]; then git pull; fi; if [[ ! -z ${NODE_PACKAGES} ]]; then \/usr\/local\/bin\/npm install ${NODE_PACKAGES}; fi; if [[ ! -z ${UNNODE_PACKAGES} ]]; then \/usr\/local\/bin\/npm uninstall ${UNNODE_PACKAGES}; fi; if [ -f \/home\/container\/package.json ]; then \/usr\/local\/bin\/npm install --production; fi; \/home\/container\/node_modules\/nodemon\/bin\/nodemon.js \/home\/container\/{{BOT_JS_FILE}}",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"Connected\"\r\n}",
+        "logs": "{}",
+        "stop": "^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n# NodeJS Bot Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\napt update\r\napt install -y git curl jq file unzip make gcc g++ python python-dev libtool\r\n\r\nmkdir -p \/mnt\/server\r\ncd \/mnt\/server\r\n\r\nif [ \"${USER_UPLOAD}\" == \"true\" ] || [ \"${USER_UPLOAD}\" == \"1\" ]; then\r\n    echo -e \"assuming user knows what they are doing have a good day.\"\r\n    exit 0\r\nfi\r\n\r\n## add git ending if it's not on the address\r\nif [[ ${GIT_ADDRESS} != *.git ]]; then\r\n    GIT_ADDRESS=${GIT_ADDRESS}.git\r\nfi\r\n\r\nif [ -z \"${USERNAME}\" ] && [ -z \"${ACCESS_TOKEN}\" ]; then\r\n    echo -e \"using anon api call\"\r\nelse\r\n    GIT_ADDRESS=\"https:\/\/${USERNAME}:${ACCESS_TOKEN}@$(echo -e ${GIT_ADDRESS} | cut -d\/ -f3-)\"\r\nfi\r\n\r\n## pull git js bot repo\r\nif [ \"$(ls -A \/mnt\/server)\" ]; then\r\n    echo -e \"\/mnt\/server directory is not empty.\"\r\n    if [ -d .git ]; then\r\n        echo -e \".git directory exists\"\r\n        if [ -f .git\/config ]; then\r\n            echo -e \"loading info from git config\"\r\n            ORIGIN=$(git config --get remote.origin.url)\r\n        else\r\n            echo -e \"files found with no git config\"\r\n            echo -e \"closing out without touching things to not break anything\"\r\n            exit 10\r\n        fi\r\n    fi\r\n\r\n    if [ \"${ORIGIN}\" == \"${GIT_ADDRESS}\" ]; then\r\n        echo \"pulling latest from github\"\r\n        git pull\r\n    fi\r\nelse\r\n    echo -e \"\/mnt\/server is empty.\\ncloning files into repo\"\r\n    if [ -z ${BRANCH} ]; then\r\n        echo -e \"cloning default branch\"\r\n        git clone ${GIT_ADDRESS} .\r\n    else\r\n        echo -e \"cloning ${BRANCH}'\"\r\n        git clone --single-branch --branch ${BRANCH} ${GIT_ADDRESS} .\r\n    fi\r\n\r\nfi\r\n\r\necho \"Installing nodejs packages\"\r\nif [[ ! -z ${NODE_PACKAGES} ]]; then\r\n    \/usr\/local\/bin\/npm install ${NODE_PACKAGES}\r\nfi\r\n\r\nif [ -f \/mnt\/server\/package.json ]; then\r\n    \/usr\/local\/bin\/npm install --production\r\nfi\r\n\r\necho -e \"install complete\"\r\nexit 0",
+            "container": "node:lts-bookworm",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "\ud83d\udda5\ufe0f Message de d\u00e9marrage",
+            "description": "\ud83d\udda5\ufe0f Message de d\u00e9marrage attendu dans la console\r\nTexte affich\u00e9 lorsque votre application est pr\u00eate. Utilis\u00e9 pour confirmer que le bot ou l'app fonctionne correctement.\r\n( cette variable n'est pas modifiable, elle est not\u00e9e ici pour information ! )",
+            "env_variable": "START_MESSAGE",
+            "default_value": "Connected",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "\ud83d\udd10 Token Git",
+            "description": "\ud83d\udd10 Jeton d\u2019acc\u00e8s personnel (PAT)\r\nCl\u00e9 d\u2019acc\u00e8s utilis\u00e9e pour authentifier les d\u00e9p\u00f4ts Git priv\u00e9s.\r\n\r\n\ud83d\udd17  https:\/\/github.com\/settings\/tokens\r\n\ud83d\udd17  https:\/\/gitlab.com\/-\/profile\/personal_access_tokens",
+            "env_variable": "ACCESS_TOKEN",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "\ud83d\udc64 Nom d'utilisateur Git",
+            "description": "\ud83d\udc64 Nom d\u2019utilisateur Git\r\nNom d\u2019utilisateur utilis\u00e9 pour l\u2019authentification lors du clonage du d\u00e9p\u00f4t priv\u00e9.",
+            "env_variable": "USERNAME",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "\ud83e\uddf9 D\u00e9sinstaller des modules Node",
+            "description": "\ud83e\uddf9 Modules Node.js \u00e0 d\u00e9sinstaller\r\nIndiquez les modules \u00e0 supprimer juste apr\u00e8s l\u2019installation.\r\nUtilisez des espaces pour les s\u00e9parer.",
+            "env_variable": "UNNODE_PACKAGES",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "\ud83d\udce6 Installer des modules Node",
+            "description": "\ud83d\udce6 Modules Node.js \u00e0 installer\r\nSaisissez les modules \u00e0 installer automatiquement (ex: express dotenv axios).\r\nUtilisez des espaces pour les s\u00e9parer.",
+            "env_variable": "NODE_PACKAGES",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "\ud83d\udcc4 Racine app Node.js",
+            "description": "\ud83d\udcc4 Fichier de d\u00e9marrage de votre application Node.js\r\nIndique le fichier principal (ex: index.js, bot.js, etc.) \u00e0 ex\u00e9cuter pour lancer votre application.",
+            "env_variable": "BOT_JS_FILE",
+            "default_value": "index.js",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string",
+            "field_type": "text"
+        },
+        {
+            "name": "\ud83d\udd04 Mise \u00e0 jour auto",
+            "description": "\ud83d\udce5 R\u00e9cup\u00e8re les derniers fichiers au d\u00e9marrage lorsque tu utilises un d\u00e9p\u00f4t GitHub.\r\n\ud83d\udcc1 Le dossier .git doit \u00eatre pr\u00e9sent \u2014 r\u00e9installe l'egg si tu ne le vois pas.",
+            "env_variable": "AUTO_UPDATE",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "\ud83d\udcc2 Fichiers t\u00e9l\u00e9vers\u00e9s par l\u2019utilisateur",
+            "description": "Permet de sauter l\u2019\u00e9tape d\u2019installation automatique (Git, modules...) si l\u2019utilisateur choisit d\u2019envoyer ses propres fichiers.\r\n0 = \u274c d\u00e9sactiv\u00e9 (par d\u00e9faut)\r\n1 = \u2705 activ\u00e9",
+            "env_variable": "USER_UPLOAD",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "\ud83c\udf3f Branche \u00e0 installer",
+            "description": "Nom de la branche Git \u00e0 utiliser lors du clonage du d\u00e9p\u00f4t.\r\n(Par d\u00e9faut : master si non sp\u00e9cifi\u00e9)",
+            "env_variable": "BRANCH",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "\ud83d\udd17 Adresse du d\u00e9p\u00f4t Git",
+            "description": "URL du d\u00e9p\u00f4t GitHub (ou GitLab) \u00e0 cloner pour r\u00e9cup\u00e9rer les fichiers de votre bot ou application.\r\nExemple :\r\nhttps:\/\/github.com\/Swiftheberg\/nom_du_repo",
+            "env_variable": "GIT_ADDRESS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string",
+            "field_type": "text"
+        }
+    ]
+}
